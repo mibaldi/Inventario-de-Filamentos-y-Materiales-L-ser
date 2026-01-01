@@ -9,7 +9,9 @@
       "Bash(firebase deploy:*)",
       "Bash(firebase functions:delete:*)",
       "Skill(frontend-design:frontend-design)",
-      "Skill(frontend-design:frontend-design:*)"
+      "Skill(frontend-design:frontend-design:*)",
+      "Bash(cat:*)",
+      "Bash(firebase functions:secrets:access:*)"
     ]
   }
 }

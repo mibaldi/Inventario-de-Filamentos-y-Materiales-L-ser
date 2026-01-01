@@ -1,12 +1,14 @@
 import { HttpsError, type CallableRequest } from "firebase-functions/v2/https";
+import { defineSecret } from "firebase-functions/params";
 
-const OWNER_UID = process.env.OWNER_UID;
+export const ownerUidSecret = defineSecret("OWNER_UID");
 
 export function assertOwner(request: CallableRequest): void {
   if (!request.auth) {
     throw new HttpsError("unauthenticated", "Debes iniciar sesion");
   }
 
+  const OWNER_UID = ownerUidSecret.value();
   if (!OWNER_UID) {
     throw new HttpsError(
       "failed-precondition",
@@ -23,6 +25,7 @@ export function assertOwner(request: CallableRequest): void {
 }
 
 export function getOwnerUid(): string {
+  const OWNER_UID = ownerUidSecret.value();
   if (!OWNER_UID) {
     throw new HttpsError(
       "failed-precondition",

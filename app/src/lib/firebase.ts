@@ -23,7 +23,7 @@ if (typeof window !== "undefined") {
   app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
   auth = firebaseGetAuth(app);
   db = firebaseGetFirestore(app);
-  functions = firebaseGetFunctions(app);
+  functions = firebaseGetFunctions(app, "europe-west1");
 }
 
 export { auth, db, functions };

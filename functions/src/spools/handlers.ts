@@ -1,7 +1,7 @@
 import { onCall, HttpsError } from "firebase-functions/v2/https";
 import { getFirestore, Timestamp } from "firebase-admin/firestore";
 import { initializeApp, getApps } from "firebase-admin/app";
-import { assertOwner, getOwnerUid } from "../utils/auth.js";
+import { assertOwner, getOwnerUid, ownerUidSecret } from "../utils/auth.js";
 import {
   SpoolCreateInput,
   SpoolUpdateInput,
@@ -28,8 +28,9 @@ function deriveStatus(
 }
 
 const region = "europe-west1";
+const secrets = [ownerUidSecret];
 
-export const spoolsCreate = onCall({ region }, async (request) => {
+export const spoolsCreate = onCall({ region, secrets }, async (request) => {
   assertOwner(request);
 
   const parsed = SpoolCreateInput.safeParse(request.data);
@@ -66,7 +67,7 @@ export const spoolsCreate = onCall({ region }, async (request) => {
   return { id: docRef.id };
 });
 
-export const spoolsUpdate = onCall({ region }, async (request) => {
+export const spoolsUpdate = onCall({ region, secrets }, async (request) => {
   assertOwner(request);
 
   const parsed = SpoolUpdateInput.safeParse(request.data);
@@ -118,7 +119,7 @@ export const spoolsUpdate = onCall({ region }, async (request) => {
   return { success: true };
 });
 
-export const spoolsArchive = onCall({ region }, async (request) => {
+export const spoolsArchive = onCall({ region, secrets }, async (request) => {
   assertOwner(request);
 
   const parsed = SpoolIdInput.safeParse(request.data);
@@ -142,7 +143,7 @@ export const spoolsArchive = onCall({ region }, async (request) => {
   return { success: true };
 });
 
-export const spoolsDelete = onCall({ region }, async (request) => {
+export const spoolsDelete = onCall({ region, secrets }, async (request) => {
   assertOwner(request);
 
   const parsed = SpoolIdInput.safeParse(request.data);
@@ -172,7 +173,7 @@ export const spoolsDelete = onCall({ region }, async (request) => {
 
 // ==================== READ FUNCTIONS ====================
 
-export const spoolsList = onCall({ region }, async (request) => {
+export const spoolsList = onCall({ region, secrets }, async (request) => {
   assertOwner(request);
 
   const snapshot = await db
@@ -189,7 +190,7 @@ export const spoolsList = onCall({ region }, async (request) => {
   }));
 });
 
-export const spoolsGet = onCall({ region }, async (request) => {
+export const spoolsGet = onCall({ region, secrets }, async (request) => {
   assertOwner(request);
 
   const parsed = SpoolIdInput.safeParse(request.data);
@@ -214,7 +215,7 @@ export const spoolsGet = onCall({ region }, async (request) => {
   };
 });
 
-export const spoolsGetWeighIns = onCall({ region }, async (request) => {
+export const spoolsGetWeighIns = onCall({ region, secrets }, async (request) => {
   assertOwner(request);
 
   const parsed = SpoolIdInput.safeParse(request.data);
@@ -237,7 +238,7 @@ export const spoolsGetWeighIns = onCall({ region }, async (request) => {
   }));
 });
 
-export const spoolsAddWeighIn = onCall({ region }, async (request) => {
+export const spoolsAddWeighIn = onCall({ region, secrets }, async (request) => {
   assertOwner(request);
 
   const parsed = WeighInInput.safeParse(request.data);

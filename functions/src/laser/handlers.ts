@@ -1,7 +1,7 @@
 import { onCall, HttpsError } from "firebase-functions/v2/https";
 import { getFirestore, Timestamp } from "firebase-admin/firestore";
 import { initializeApp, getApps } from "firebase-admin/app";
-import { assertOwner, getOwnerUid } from "../utils/auth.js";
+import { assertOwner, getOwnerUid, ownerUidSecret } from "../utils/auth.js";
 import {
   LaserCreateInput,
   LaserUpdateInput,
@@ -15,8 +15,9 @@ if (getApps().length === 0) {
 
 const db = getFirestore();
 const region = "europe-west1";
+const secrets = [ownerUidSecret];
 
-export const laserCreate = onCall({ region }, async (request) => {
+export const laserCreate = onCall({ region, secrets }, async (request) => {
   assertOwner(request);
 
   const parsed = LaserCreateInput.safeParse(request.data);
@@ -50,7 +51,7 @@ export const laserCreate = onCall({ region }, async (request) => {
   return { id: docRef.id };
 });
 
-export const laserUpdate = onCall({ region }, async (request) => {
+export const laserUpdate = onCall({ region, secrets }, async (request) => {
   assertOwner(request);
 
   const parsed = LaserUpdateInput.safeParse(request.data);
@@ -81,7 +82,7 @@ export const laserUpdate = onCall({ region }, async (request) => {
   return { success: true };
 });
 
-export const laserAdjustStock = onCall({ region }, async (request) => {
+export const laserAdjustStock = onCall({ region, secrets }, async (request) => {
   assertOwner(request);
 
   const parsed = AdjustStockInput.safeParse(request.data);
@@ -128,7 +129,7 @@ export const laserAdjustStock = onCall({ region }, async (request) => {
 
 // ==================== READ FUNCTIONS ====================
 
-export const laserList = onCall({ region }, async (request) => {
+export const laserList = onCall({ region, secrets }, async (request) => {
   assertOwner(request);
 
   const snapshot = await db
@@ -144,7 +145,7 @@ export const laserList = onCall({ region }, async (request) => {
   }));
 });
 
-export const laserGet = onCall({ region }, async (request) => {
+export const laserGet = onCall({ region, secrets }, async (request) => {
   assertOwner(request);
 
   const parsed = LaserIdInput.safeParse(request.data);
@@ -168,7 +169,7 @@ export const laserGet = onCall({ region }, async (request) => {
   };
 });
 
-export const laserGetMovements = onCall({ region }, async (request) => {
+export const laserGetMovements = onCall({ region, secrets }, async (request) => {
   assertOwner(request);
 
   const parsed = LaserIdInput.safeParse(request.data);
@@ -191,7 +192,7 @@ export const laserGetMovements = onCall({ region }, async (request) => {
   }));
 });
 
-export const laserDelete = onCall({ region }, async (request) => {
+export const laserDelete = onCall({ region, secrets }, async (request) => {
   assertOwner(request);
 
   const parsed = LaserIdInput.safeParse(request.data);
