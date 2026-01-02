@@ -115,16 +115,16 @@ export default function NewSpoolPage() {
               <div className="space-y-2">
                 <Label htmlFor="brand">Marca</Label>
                 <Select
-                  value={formData.brand}
+                  value={formData.brand || "none"}
                   onValueChange={(value) =>
-                    setFormData({ ...formData, brand: value })
+                    setFormData({ ...formData, brand: value === "none" ? "" : value })
                   }
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Seleccionar marca" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">Otra / Desconocida</SelectItem>
+                    <SelectItem value="none">Otra / Desconocida</SelectItem>
                     {brandNames.map((brand) => (
                       <SelectItem key={brand} value={brand}>
                         {brand}

@@ -99,12 +99,12 @@ export function WeightEstimator({
       {/* Selector de marca */}
       <div className="space-y-2">
         <Label htmlFor="brand">Marca (para estimar tara)</Label>
-        <Select value={selectedBrand} onValueChange={setSelectedBrand}>
+        <Select value={selectedBrand || "none"} onValueChange={(v) => setSelectedBrand(v === "none" ? "" : v)}>
           <SelectTrigger id="brand">
             <SelectValue placeholder="Selecciona marca..." />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="">Sin marca / Otra</SelectItem>
+            <SelectItem value="none">Sin marca / Otra</SelectItem>
             {brandNames.map((name) => (
               <SelectItem key={name} value={name}>
                 {name}
