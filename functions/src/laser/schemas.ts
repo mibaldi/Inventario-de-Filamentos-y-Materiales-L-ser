@@ -10,25 +10,25 @@ export const LaserCreateInput = z.object({
   type: z.string().min(1, "Tipo requerido"),
   thicknessMm: z.number().positive("Espesor debe ser positivo"),
   format: LaserFormat,
-  widthMm: z.number().positive().optional(),
-  heightMm: z.number().positive().optional(),
+  widthMm: z.number().positive().nullable().optional(),
+  heightMm: z.number().positive().nullable().optional(),
   quantityInitial: z.number().int().positive("Cantidad inicial debe ser positiva"),
   safeFlag: SafeFlag.default("OK"),
-  location: z.string().optional(),
-  notes: z.string().optional(),
-  thresholdQty: z.number().int().positive().optional(),
+  location: z.string().nullable().optional(),
+  notes: z.string().nullable().optional(),
+  thresholdQty: z.number().int().positive().nullable().optional(),
 });
 export type LaserCreateInput = z.infer<typeof LaserCreateInput>;
 
 export const LaserUpdateInput = z.object({
   materialId: z.string().min(1, "materialId requerido"),
-  type: z.string().min(1).optional(),
-  thicknessMm: z.number().positive().optional(),
-  format: LaserFormat.optional(),
+  type: z.string().min(1).nullable().optional(),
+  thicknessMm: z.number().positive().nullable().optional(),
+  format: LaserFormat.nullable().optional(),
   widthMm: z.number().positive().nullable().optional(),
   heightMm: z.number().positive().nullable().optional(),
-  quantityInitial: z.number().int().positive().optional(),
-  safeFlag: SafeFlag.optional(),
+  quantityInitial: z.number().int().positive().nullable().optional(),
+  safeFlag: SafeFlag.nullable().optional(),
   location: z.string().nullable().optional(),
   notes: z.string().nullable().optional(),
   thresholdQty: z.number().int().positive().nullable().optional(),
@@ -38,7 +38,7 @@ export type LaserUpdateInput = z.infer<typeof LaserUpdateInput>;
 export const AdjustStockInput = z.object({
   materialId: z.string().min(1, "materialId requerido"),
   delta: z.number().int().refine((v) => v !== 0, "Delta no puede ser 0"),
-  note: z.string().optional(),
+  note: z.string().nullable().optional(),
 });
 export type AdjustStockInput = z.infer<typeof AdjustStockInput>;
 
