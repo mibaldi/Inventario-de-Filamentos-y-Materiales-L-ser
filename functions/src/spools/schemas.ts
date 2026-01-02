@@ -11,6 +11,7 @@ export type SpoolStatus = z.infer<typeof SpoolStatus>;
 
 export const SpoolCreateInput = z.object({
   label: z.string().min(1, "Label requerido"),
+  brand: z.string().optional(),
   material: z.string().min(1, "Material requerido"),
   color: z.string().min(1, "Color requerido"),
   diameter: z.number().positive("Diametro debe ser positivo"),
@@ -26,6 +27,7 @@ export type SpoolCreateInput = z.infer<typeof SpoolCreateInput>;
 export const SpoolUpdateInput = z.object({
   spoolId: z.string().min(1, "spoolId requerido"),
   label: z.string().min(1).optional(),
+  brand: z.string().nullable().optional(),
   material: z.string().min(1).optional(),
   color: z.string().min(1).optional(),
   diameter: z.number().positive().optional(),

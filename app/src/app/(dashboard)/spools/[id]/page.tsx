@@ -26,8 +26,9 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { spoolsGet, spoolsGetWeighIns, spoolsAddWeighIn, spoolsArchive, spoolsDelete } from "@/lib/functions";
+import { spoolsGet, spoolsGetWeighIns, spoolsAddWeighIn, spoolsArchive, spoolsDelete, type EstimateRemainingResult } from "@/lib/functions";
 import type { Spool, WeighIn, SpoolStatus } from "@/types/spool";
+import { WeightEstimator } from "@/components/weight-estimator";
 
 const statusColors: Record<SpoolStatus, "default" | "secondary" | "destructive" | "outline"> = {
   NEW: "outline",
@@ -50,6 +51,8 @@ export default function SpoolDetailPage() {
   const [weighInLoading, setWeighInLoading] = useState(false);
   const [weightG, setWeightG] = useState("");
   const [weighInNote, setWeighInNote] = useState("");
+  const [useAiEstimation, setUseAiEstimation] = useState(false);
+  const [lastEstimate, setLastEstimate] = useState<EstimateRemainingResult | null>(null);
 
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [deleteLoading, setDeleteLoading] = useState(false);
@@ -152,15 +155,21 @@ export default function SpoolDetailPage() {
             <Badge variant={statusColors[spool.status]}>{spool.status}</Badge>
           </div>
           <p className="text-muted-foreground">
-            {spool.material} - {spool.color} - {spool.diameter}mm
+            {spool.brand && `${spool.brand} · `}{spool.material} - {spool.color} - {spool.diameter}mm
           </p>
         </div>
         <div className="flex gap-2">
-          <Dialog open={weighInOpen} onOpenChange={setWeighInOpen}>
+          <Dialog open={weighInOpen} onOpenChange={(open) => {
+            setWeighInOpen(open);
+            if (!open) {
+              setUseAiEstimation(false);
+              setLastEstimate(null);
+            }
+          }}>
             <DialogTrigger asChild>
               <Button>Registrar Pesada</Button>
             </DialogTrigger>
-            <DialogContent>
+            <DialogContent className="sm:max-w-md">
               <DialogHeader>
                 <DialogTitle>Registrar Pesada</DialogTitle>
                 <DialogDescription>
@@ -168,22 +177,51 @@ export default function SpoolDetailPage() {
                 </DialogDescription>
               </DialogHeader>
               <div className="space-y-4 py-4">
-                <div className="space-y-2">
-                  <Label htmlFor="weightG">Peso total en bascula (g)</Label>
-                  <Input
-                    id="weightG"
-                    type="number"
-                    min="0"
-                    step="1"
-                    placeholder="850"
-                    value={weightG}
-                    onChange={(e) => setWeightG(e.target.value)}
-                    autoFocus
+                {/* Toggle para estimación IA */}
+                <div className="flex items-center gap-2 pb-2 border-b">
+                  <input
+                    type="checkbox"
+                    id="useAiEstimation"
+                    checked={useAiEstimation}
+                    onChange={(e) => setUseAiEstimation(e.target.checked)}
+                    className="rounded border-input"
                   />
-                  <p className="text-xs text-muted-foreground">
-                    Tara de la bobina: {spool.tareG}g
-                  </p>
+                  <Label htmlFor="useAiEstimation" className="text-sm cursor-pointer">
+                    Usar estimación IA (incluye insights)
+                  </Label>
                 </div>
+
+                {useAiEstimation ? (
+                  <WeightEstimator
+                    brand={spool.brand}
+                    netInitialG={spool.netInitialG}
+                    tareG={spool.tareG}
+                    onEstimate={(result) => {
+                      setLastEstimate(result);
+                      // Calcular peso total desde el restante estimado
+                      const totalWeight = result.remainingG + result.usedTareG;
+                      setWeightG(totalWeight.toString());
+                    }}
+                  />
+                ) : (
+                  <div className="space-y-2">
+                    <Label htmlFor="weightG">Peso total en bascula (g)</Label>
+                    <Input
+                      id="weightG"
+                      type="number"
+                      min="0"
+                      step="1"
+                      placeholder="850"
+                      value={weightG}
+                      onChange={(e) => setWeightG(e.target.value)}
+                      autoFocus
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      Tara de la bobina: {spool.tareG}g
+                    </p>
+                  </div>
+                )}
+
                 <div className="space-y-2">
                   <Label htmlFor="weighInNote">Nota (opcional)</Label>
                   <Input
@@ -193,6 +231,13 @@ export default function SpoolDetailPage() {
                     onChange={(e) => setWeighInNote(e.target.value)}
                   />
                 </div>
+
+                {/* Mostrar insight de IA si existe */}
+                {lastEstimate?.aiInsights && (
+                  <div className="p-3 bg-muted/50 rounded-lg text-sm">
+                    <p className="text-muted-foreground italic">{lastEstimate.aiInsights}</p>
+                  </div>
+                )}
               </div>
               <DialogFooter>
                 <Button variant="outline" onClick={() => setWeighInOpen(false)}>

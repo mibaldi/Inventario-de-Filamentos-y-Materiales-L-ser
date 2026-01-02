@@ -4,6 +4,7 @@ export interface Spool {
   id: string;
   ownerUid: string;
   label: string;
+  brand: string | null;
   material: string;
   color: string;
   diameter: number;
@@ -31,6 +32,7 @@ export interface WeighIn {
 
 export interface SpoolCreateInput {
   label: string;
+  brand?: string;
   material: string;
   color: string;
   diameter: number;
@@ -45,6 +47,7 @@ export interface SpoolCreateInput {
 export interface SpoolUpdateInput {
   spoolId: string;
   label?: string;
+  brand?: string | null;
   material?: string;
   color?: string;
   diameter?: number;

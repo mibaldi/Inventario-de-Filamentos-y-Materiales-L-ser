@@ -14,14 +14,17 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { spoolsCreate } from "@/lib/functions";
+import { spoolsCreate, type ScanLabelResult } from "@/lib/functions";
 import { FILAMENT_MATERIALS, FILAMENT_DIAMETERS } from "@/types/spool";
+import { LabelScanner } from "@/components/label-scanner";
+import { getBrandNames } from "@/data/filament-brands";
 
 export default function NewSpoolPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     label: "",
+    brand: "",
     material: "",
     color: "",
     diameter: "1.75",
@@ -32,6 +35,24 @@ export default function NewSpoolPage() {
     notes: "",
   });
 
+  const brandNames = getBrandNames();
+
+  const handleScanComplete = (data: ScanLabelResult["data"]) => {
+    setFormData((prev) => ({
+      ...prev,
+      brand: data.brand ?? prev.brand,
+      material: data.material ?? prev.material,
+      color: data.color ?? prev.color,
+      diameter: data.diameter?.toString() ?? prev.diameter,
+      netInitialG: data.netWeightG?.toString() ?? prev.netInitialG,
+      tareG: data.suggestedTareG?.toString() ?? prev.tareG,
+      label: data.brand && data.material && data.color
+        ? `${data.material} ${data.brand} ${data.color}`
+        : prev.label,
+    }));
+    toast.success("Datos aplicados desde la etiqueta");
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -39,6 +60,7 @@ export default function NewSpoolPage() {
     try {
       const result = await spoolsCreate({
         label: formData.label,
+        brand: formData.brand || undefined,
         material: formData.material,
         color: formData.color,
         diameter: parseFloat(formData.diameter),
@@ -64,10 +86,15 @@ export default function NewSpoolPage() {
     <div className="max-w-2xl mx-auto">
       <Card>
         <CardHeader>
-          <CardTitle>Nueva Bobina</CardTitle>
-          <CardDescription>
-            Registra una nueva bobina de filamento
-          </CardDescription>
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <CardTitle>Nueva Bobina</CardTitle>
+              <CardDescription>
+                Registra una nueva bobina de filamento
+              </CardDescription>
+            </div>
+            <LabelScanner onScanComplete={handleScanComplete} />
+          </div>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
@@ -83,6 +110,28 @@ export default function NewSpoolPage() {
                   }
                   required
                 />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="brand">Marca</Label>
+                <Select
+                  value={formData.brand}
+                  onValueChange={(value) =>
+                    setFormData({ ...formData, brand: value })
+                  }
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Seleccionar marca" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="">Otra / Desconocida</SelectItem>
+                    {brandNames.map((brand) => (
+                      <SelectItem key={brand} value={brand}>
+                        {brand}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
 
               <div className="space-y-2">

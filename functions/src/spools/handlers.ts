@@ -47,6 +47,7 @@ export const spoolsCreate = onCall({ region, secrets }, async (request) => {
   await docRef.set({
     ownerUid,
     label: data.label,
+    brand: data.brand ?? null,
     material: data.material,
     color: data.color,
     diameter: data.diameter,
