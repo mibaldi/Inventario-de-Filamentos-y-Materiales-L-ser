@@ -21,6 +21,11 @@ export const SpoolCreateInput = z.object({
   thresholdG: z.number().positive().nullable().optional(),
   location: z.string().nullable().optional(),
   notes: z.string().nullable().optional(),
+  barcode: z.string().nullable().optional(),
+  printTempMinC: z.number().positive().nullable().optional(),
+  printTempMaxC: z.number().positive().nullable().optional(),
+  bedTempMinC: z.number().nonnegative().nullable().optional(),
+  bedTempMaxC: z.number().nonnegative().nullable().optional(),
 });
 export type SpoolCreateInput = z.infer<typeof SpoolCreateInput>;
 
@@ -37,6 +42,11 @@ export const SpoolUpdateInput = z.object({
   thresholdG: z.number().positive().nullable().optional(),
   location: z.string().nullable().optional(),
   notes: z.string().nullable().optional(),
+  barcode: z.string().nullable().optional(),
+  printTempMinC: z.number().positive().nullable().optional(),
+  printTempMaxC: z.number().positive().nullable().optional(),
+  bedTempMinC: z.number().nonnegative().nullable().optional(),
+  bedTempMaxC: z.number().nonnegative().nullable().optional(),
 });
 export type SpoolUpdateInput = z.infer<typeof SpoolUpdateInput>;
 
