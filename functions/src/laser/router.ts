@@ -1,5 +1,5 @@
 import { Router, Response } from "express";
-import { getFirestore, Timestamp } from "firebase-admin/firestore";
+import { getFirestore, Timestamp, Firestore } from "firebase-admin/firestore";
 import { AuthenticatedRequest, getOwnerUid } from "../utils/express-auth.js";
 import {
   LaserCreateInput,
@@ -8,12 +8,19 @@ import {
 } from "./schemas.js";
 
 const router = Router();
-const db = getFirestore();
+
+let _db: Firestore | null = null;
+function db(): Firestore {
+  if (!_db) {
+    _db = getFirestore();
+  }
+  return _db;
+}
 
 // GET /api/laser - Listar todos los materiales
 router.get("/", async (_req: AuthenticatedRequest, res: Response) => {
   try {
-    const snapshot = await db
+    const snapshot = await db()
       .collection("laserMaterials")
       .orderBy("updatedAt", "desc")
       .get();
@@ -43,7 +50,7 @@ router.post("/", async (req: AuthenticatedRequest, res: Response) => {
     const data = parsed.data;
     const ownerUid = getOwnerUid();
 
-    const docRef = db.collection("laserMaterials").doc();
+    const docRef = db().collection("laserMaterials").doc();
     const now = Timestamp.now();
 
     await docRef.set({
@@ -73,7 +80,7 @@ router.post("/", async (req: AuthenticatedRequest, res: Response) => {
 router.get("/:id", async (req: AuthenticatedRequest, res: Response) => {
   try {
     const { id } = req.params;
-    const doc = await db.collection("laserMaterials").doc(id).get();
+    const doc = await db().collection("laserMaterials").doc(id).get();
 
     if (!doc.exists) {
       res.status(404).json({ error: "Material no encontrado" });
@@ -103,7 +110,7 @@ router.put("/:id", async (req: AuthenticatedRequest, res: Response) => {
     }
 
     const { materialId: _, ...updates } = parsed.data;
-    const docRef = db.collection("laserMaterials").doc(id);
+    const docRef = db().collection("laserMaterials").doc(id);
 
     const doc = await docRef.get();
     if (!doc.exists) {
@@ -133,7 +140,7 @@ router.put("/:id", async (req: AuthenticatedRequest, res: Response) => {
 router.delete("/:id", async (req: AuthenticatedRequest, res: Response) => {
   try {
     const { id } = req.params;
-    const docRef = db.collection("laserMaterials").doc(id);
+    const docRef = db().collection("laserMaterials").doc(id);
 
     const doc = await docRef.get();
     if (!doc.exists) {
@@ -142,7 +149,7 @@ router.delete("/:id", async (req: AuthenticatedRequest, res: Response) => {
     }
 
     const movementsSnapshot = await docRef.collection("movements").get();
-    const batch = db.batch();
+    const batch = db().batch();
     movementsSnapshot.docs.forEach((movementDoc) => {
       batch.delete(movementDoc.ref);
     });
@@ -168,7 +175,7 @@ router.post("/:id/adjust-stock", async (req: AuthenticatedRequest, res: Response
     const { delta, note } = parsed.data;
     const ownerUid = getOwnerUid();
 
-    const materialRef = db.collection("laserMaterials").doc(id);
+    const materialRef = db().collection("laserMaterials").doc(id);
     const materialDoc = await materialRef.get();
 
     if (!materialDoc.exists) {
@@ -207,7 +214,7 @@ router.post("/:id/adjust-stock", async (req: AuthenticatedRequest, res: Response
 router.get("/:id/movements", async (req: AuthenticatedRequest, res: Response) => {
   try {
     const { id } = req.params;
-    const snapshot = await db
+    const snapshot = await db()
       .collection("laserMaterials")
       .doc(id)
       .collection("movements")

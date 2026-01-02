@@ -1,11 +1,18 @@
 import { Router, Response } from "express";
-import { getFirestore } from "firebase-admin/firestore";
+import { getFirestore, Firestore } from "firebase-admin/firestore";
 import { AuthenticatedRequest, getOwnerUid } from "../utils/express-auth.js";
 import { z } from "zod";
 import { getAISettings } from "./handlers.js";
 
 const router = Router();
-const db = getFirestore();
+
+let _db: Firestore | null = null;
+function db(): Firestore {
+  if (!_db) {
+    _db = getFirestore();
+  }
+  return _db;
+}
 
 const AISettingsInput = z.object({
   provider: z.enum(["perplexity", "lmstudio"]),
@@ -18,7 +25,7 @@ const AISettingsInput = z.object({
 router.get("/ai", async (_req: AuthenticatedRequest, res: Response) => {
   try {
     const ownerUid = getOwnerUid();
-    const doc = await db.collection("settings").doc(ownerUid).get();
+    const doc = await db().collection("settings").doc(ownerUid).get();
 
     if (!doc.exists) {
       res.json({
@@ -65,7 +72,7 @@ router.post("/ai", async (req: AuthenticatedRequest, res: Response) => {
       updateData.perplexityApiKey = data.perplexityApiKey;
     }
 
-    await db.collection("settings").doc(ownerUid).set(updateData, { merge: true });
+    await db().collection("settings").doc(ownerUid).set(updateData, { merge: true });
 
     res.json({ success: true });
   } catch (error) {

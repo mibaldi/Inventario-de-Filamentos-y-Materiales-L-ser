@@ -1,5 +1,5 @@
 import { Router, Response } from "express";
-import { getFirestore, Timestamp } from "firebase-admin/firestore";
+import { getFirestore, Timestamp, Firestore } from "firebase-admin/firestore";
 import { AuthenticatedRequest, getOwnerUid } from "../utils/express-auth.js";
 import {
   SpoolCreateInput,
@@ -9,7 +9,14 @@ import {
 } from "./schemas.js";
 
 const router = Router();
-const db = getFirestore();
+
+let _db: Firestore | null = null;
+function db(): Firestore {
+  if (!_db) {
+    _db = getFirestore();
+  }
+  return _db;
+}
 
 function deriveStatus(
   remainingG: number,
@@ -25,7 +32,7 @@ function deriveStatus(
 // GET /api/spools - Listar todas las bobinas
 router.get("/", async (_req: AuthenticatedRequest, res: Response) => {
   try {
-    const snapshot = await db
+    const snapshot = await db()
       .collection("spools")
       .orderBy("updatedAt", "desc")
       .get();
@@ -56,7 +63,7 @@ router.post("/", async (req: AuthenticatedRequest, res: Response) => {
     const data = parsed.data;
     const ownerUid = getOwnerUid();
 
-    const docRef = db.collection("spools").doc();
+    const docRef = db().collection("spools").doc();
     const now = Timestamp.now();
 
     await docRef.set({
@@ -95,7 +102,7 @@ router.post("/", async (req: AuthenticatedRequest, res: Response) => {
 router.get("/:id", async (req: AuthenticatedRequest, res: Response) => {
   try {
     const { id } = req.params;
-    const doc = await db.collection("spools").doc(id).get();
+    const doc = await db().collection("spools").doc(id).get();
 
     if (!doc.exists) {
       res.status(404).json({ error: "Bobina no encontrada" });
@@ -126,7 +133,7 @@ router.put("/:id", async (req: AuthenticatedRequest, res: Response) => {
     }
 
     const { spoolId: _, ...updates } = parsed.data;
-    const docRef = db.collection("spools").doc(id);
+    const docRef = db().collection("spools").doc(id);
 
     const doc = await docRef.get();
     if (!doc.exists) {
@@ -175,7 +182,7 @@ router.put("/:id", async (req: AuthenticatedRequest, res: Response) => {
 router.delete("/:id", async (req: AuthenticatedRequest, res: Response) => {
   try {
     const { id } = req.params;
-    const docRef = db.collection("spools").doc(id);
+    const docRef = db().collection("spools").doc(id);
 
     const doc = await docRef.get();
     if (!doc.exists) {
@@ -184,7 +191,7 @@ router.delete("/:id", async (req: AuthenticatedRequest, res: Response) => {
     }
 
     const weighInsSnapshot = await docRef.collection("weighIns").get();
-    const batch = db.batch();
+    const batch = db().batch();
     weighInsSnapshot.docs.forEach((weighInDoc) => {
       batch.delete(weighInDoc.ref);
     });
@@ -201,7 +208,7 @@ router.delete("/:id", async (req: AuthenticatedRequest, res: Response) => {
 router.post("/:id/archive", async (req: AuthenticatedRequest, res: Response) => {
   try {
     const { id } = req.params;
-    const docRef = db.collection("spools").doc(id);
+    const docRef = db().collection("spools").doc(id);
 
     const doc = await docRef.get();
     if (!doc.exists) {
@@ -224,7 +231,7 @@ router.post("/:id/archive", async (req: AuthenticatedRequest, res: Response) => 
 router.get("/:id/weigh-ins", async (req: AuthenticatedRequest, res: Response) => {
   try {
     const { id } = req.params;
-    const snapshot = await db
+    const snapshot = await db()
       .collection("spools")
       .doc(id)
       .collection("weighIns")
@@ -256,7 +263,7 @@ router.post("/:id/weigh-ins", async (req: AuthenticatedRequest, res: Response) =
     const { weightG, note } = parsed.data;
     const ownerUid = getOwnerUid();
 
-    const spoolRef = db.collection("spools").doc(id);
+    const spoolRef = db().collection("spools").doc(id);
     const spoolDoc = await spoolRef.get();
 
     if (!spoolDoc.exists) {

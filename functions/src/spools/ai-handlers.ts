@@ -1,7 +1,12 @@
 import { onCall, HttpsError } from "firebase-functions/v2/https";
+import { initializeApp, getApps } from "firebase-admin/app";
 import { assertOwner, getOwnerUid, ownerUidSecret } from "../utils/auth.js";
 import { getAISettings, type AISettings } from "../settings/handlers.js";
 import { z } from "zod";
+
+if (getApps().length === 0) {
+  initializeApp();
+}
 
 const region = "europe-west1";
 const secrets = [ownerUidSecret];
