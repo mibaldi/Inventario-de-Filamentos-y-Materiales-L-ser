@@ -14,8 +14,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { laserCreate } from "@/lib/functions";
+import { laserCreate, type ScanMaterialLabelResult } from "@/lib/functions";
 import { LASER_MATERIAL_TYPES, COMMON_THICKNESSES, type LaserFormat, type SafeFlag } from "@/types/laser";
+import { MaterialLabelScanner } from "@/components/material-label-scanner";
+import { Badge } from "@/components/ui/badge";
+import { PackageIcon, XIcon } from "lucide-react";
 
 export default function NewLaserPage() {
   const router = useRouter();
@@ -23,7 +26,7 @@ export default function NewLaserPage() {
   const [formData, setFormData] = useState({
     type: "",
     thicknessMm: "",
-    format: "SHEET" as LaserFormat,
+    format: "PCS" as LaserFormat,
     widthMm: "",
     heightMm: "",
     quantityInitial: "",
@@ -31,7 +34,49 @@ export default function NewLaserPage() {
     thresholdQty: "",
     location: "",
     notes: "",
+    // Campos adicionales del escaner
+    brand: "",
+    model: "",
+    barcode: "",
+    imageUrl: "",
   });
+
+  const handleScanComplete = (data: ScanMaterialLabelResult["data"]) => {
+    // Buscar el espesor mas cercano en la lista de espesores comunes
+    let closestThickness = "";
+    if (data.thicknessMm) {
+      const closest = COMMON_THICKNESSES.reduce((prev, curr) =>
+        Math.abs(curr - data.thicknessMm!) < Math.abs(prev - data.thicknessMm!) ? curr : prev
+      );
+      closestThickness = closest.toString();
+    }
+
+    setFormData((prev) => ({
+      ...prev,
+      type: data.type && LASER_MATERIAL_TYPES.includes(data.type as typeof LASER_MATERIAL_TYPES[number])
+        ? data.type
+        : prev.type,
+      thicknessMm: closestThickness || prev.thicknessMm,
+      safeFlag: data.safeFlag || prev.safeFlag,
+      quantityInitial: data.pcsPerPack?.toString() || prev.quantityInitial,
+      brand: data.brand || "",
+      model: data.model || "",
+      barcode: data.barcode || "",
+      imageUrl: data.imageUrl || "",
+    }));
+
+    toast.success("Datos aplicados desde la etiqueta");
+  };
+
+  const clearScannedData = () => {
+    setFormData((prev) => ({
+      ...prev,
+      brand: "",
+      model: "",
+      barcode: "",
+      imageUrl: "",
+    }));
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -49,6 +94,11 @@ export default function NewLaserPage() {
         thresholdQty: formData.thresholdQty ? parseInt(formData.thresholdQty) : undefined,
         location: formData.location || undefined,
         notes: formData.notes || undefined,
+        // Campos adicionales del escaner
+        brand: formData.brand || undefined,
+        model: formData.model || undefined,
+        barcode: formData.barcode || undefined,
+        imageUrl: formData.imageUrl || undefined,
       });
 
       toast.success("Material creado correctamente");
@@ -65,13 +115,49 @@ export default function NewLaserPage() {
     <div className="max-w-2xl mx-auto">
       <Card>
         <CardHeader>
-          <CardTitle>Nuevo Material Laser</CardTitle>
-          <CardDescription>
-            Registra un nuevo material para corte laser
-          </CardDescription>
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle>Nuevo Material Laser</CardTitle>
+              <CardDescription>
+                Registra un nuevo material para corte laser
+              </CardDescription>
+            </div>
+            <MaterialLabelScanner onScanComplete={handleScanComplete} />
+          </div>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
+            {/* Material escaneado preview */}
+            {formData.imageUrl && (
+              <div className="bg-muted/50 rounded-lg p-4 flex items-center gap-4">
+                <img
+                  src={formData.imageUrl}
+                  alt={formData.model || "Material"}
+                  className="w-16 h-16 object-contain rounded-lg border bg-white"
+                />
+                <div className="flex-1">
+                  <div className="flex items-center gap-2 mb-1">
+                    <PackageIcon className="size-4 text-primary" />
+                    <span className="font-medium text-sm">{formData.brand || "Material"}</span>
+                    {formData.model && (
+                      <Badge variant="secondary" className="text-xs">{formData.model}</Badge>
+                    )}
+                  </div>
+                  {formData.barcode && (
+                    <p className="text-xs text-muted-foreground font-mono">{formData.barcode}</p>
+                  )}
+                </div>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon-sm"
+                  onClick={clearScannedData}
+                >
+                  <XIcon className="size-4" />
+                </Button>
+              </div>
+            )}
+
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="space-y-2">
                 <Label htmlFor="type">Tipo de material *</Label>

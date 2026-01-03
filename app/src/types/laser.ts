@@ -15,6 +15,11 @@ export interface LaserMaterial {
   location: string | null;
   notes: string | null;
   thresholdQty: number | null;
+  // Campos adicionales para materiales escaneados
+  brand: string | null;
+  model: string | null;
+  barcode: string | null;
+  imageUrl: string | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -38,6 +43,11 @@ export interface LaserCreateInput {
   location?: string;
   notes?: string;
   thresholdQty?: number;
+  // Campos adicionales para materiales escaneados
+  brand?: string;
+  model?: string;
+  barcode?: string;
+  imageUrl?: string;
 }
 
 export interface LaserUpdateInput {
@@ -52,6 +62,10 @@ export interface LaserUpdateInput {
   location?: string | null;
   notes?: string | null;
   thresholdQty?: number | null;
+  brand?: string | null;
+  model?: string | null;
+  barcode?: string | null;
+  imageUrl?: string | null;
 }
 
 export interface AdjustStockInput {

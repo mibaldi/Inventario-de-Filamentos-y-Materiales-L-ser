@@ -180,3 +180,44 @@ export async function laserAdjustStock(
 export async function laserDelete(materialId: string): Promise<{ success: boolean }> {
   return api.delete(`/laser/${materialId}`);
 }
+
+// ==================== Laser - AI ====================
+
+export interface ScanMaterialLabelResult {
+  success: boolean;
+  provider: AIProvider;
+  data: {
+    brand: string | null;
+    name: string | null;
+    model: string | null;
+    type: string | null;
+    thicknessMm: number | null;
+    pcsPerPack: number | null;
+    barcode: string | null;
+    color: string | null;
+    safeFlag: "OK" | "CAUTION" | "NO";
+    imageUrl: string | null;
+    catalogMatch: boolean;
+  };
+}
+
+export interface BambuCatalogMaterial {
+  name: string;
+  model: string;
+  barcode: string;
+  type: string;
+  thicknessMm: number;
+  pcsPerPack: number;
+  safeFlag: "OK" | "CAUTION" | "NO";
+  imageUrl: string;
+}
+
+export async function laserScanLabel(data: {
+  imageBase64: string;
+}): Promise<ScanMaterialLabelResult> {
+  return api.post("/laser/scan-label", data);
+}
+
+export async function laserGetCatalog(): Promise<BambuCatalogMaterial[]> {
+  return api.get("/laser/catalog");
+}

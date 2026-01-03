@@ -17,6 +17,11 @@ export const LaserCreateInput = z.object({
   location: z.string().nullable().optional(),
   notes: z.string().nullable().optional(),
   thresholdQty: z.number().int().positive().nullable().optional(),
+  // Campos adicionales para materiales escaneados
+  brand: z.string().nullable().optional(),
+  model: z.string().nullable().optional(),
+  barcode: z.string().nullable().optional(),
+  imageUrl: z.string().url().nullable().optional(),
 });
 export type LaserCreateInput = z.infer<typeof LaserCreateInput>;
 
@@ -32,6 +37,10 @@ export const LaserUpdateInput = z.object({
   location: z.string().nullable().optional(),
   notes: z.string().nullable().optional(),
   thresholdQty: z.number().int().positive().nullable().optional(),
+  brand: z.string().nullable().optional(),
+  model: z.string().nullable().optional(),
+  barcode: z.string().nullable().optional(),
+  imageUrl: z.string().url().nullable().optional(),
 });
 export type LaserUpdateInput = z.infer<typeof LaserUpdateInput>;
 

@@ -66,6 +66,11 @@ router.post("/", async (req: AuthenticatedRequest, res: Response) => {
       location: data.location ?? null,
       notes: data.notes ?? null,
       thresholdQty: data.thresholdQty ?? null,
+      // Campos adicionales para materiales escaneados
+      brand: data.brand ?? null,
+      model: data.model ?? null,
+      barcode: data.barcode ?? null,
+      imageUrl: data.imageUrl ?? null,
       createdAt: now,
       updatedAt: now,
     });

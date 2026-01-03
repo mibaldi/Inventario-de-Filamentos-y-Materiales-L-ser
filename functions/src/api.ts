@@ -9,6 +9,7 @@ import { ownerUidSecret } from "./utils/auth.js";
 import spoolsRouter from "./spools/router.js";
 import spoolsAiRouter from "./spools/ai-router.js";
 import laserRouter from "./laser/router.js";
+import laserAiRouter from "./laser/ai-router.js";
 import settingsRouter from "./settings/router.js";
 import authRouter from "./utils/auth-router.js";
 
@@ -36,6 +37,7 @@ app.use(ownerMiddleware);
 app.use("/spools", spoolsRouter);
 app.use("/spools", spoolsAiRouter);
 app.use("/laser", laserRouter);
+app.use("/laser", laserAiRouter);
 app.use("/settings", settingsRouter);
 
 // Health check
