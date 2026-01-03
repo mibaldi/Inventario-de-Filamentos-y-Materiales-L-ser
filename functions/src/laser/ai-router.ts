@@ -373,8 +373,11 @@ Si no puedes identificar algún campo, usa null.`;
       };
     }
 
+    // Convertir barcode a string si es número (la IA puede devolverlo como número)
+    const barcodeStr = extractedData.barcode != null ? String(extractedData.barcode) : undefined;
+
     // Buscar en el catálogo de Bambu Lab por código de barras o modelo
-    const catalogMatch = findMaterialInCatalog(extractedData.barcode, extractedData.model);
+    const catalogMatch = findMaterialInCatalog(barcodeStr, extractedData.model);
 
     // Combinar datos extraídos con datos del catálogo
     const finalData = {
@@ -384,7 +387,7 @@ Si no puedes identificar algún campo, usa null.`;
       type: catalogMatch?.type ?? extractedData.type ?? null,
       thicknessMm: catalogMatch?.thicknessMm ?? extractedData.thicknessMm ?? null,
       pcsPerPack: catalogMatch?.pcsPerPack ?? extractedData.pcsPerPack ?? null,
-      barcode: catalogMatch?.barcode ?? extractedData.barcode ?? null,
+      barcode: catalogMatch?.barcode ?? barcodeStr ?? null,
       color: extractedData.color ?? null,
       safeFlag: catalogMatch?.safeFlag ?? "OK",
       imageUrl: catalogMatch?.imageUrl ?? null,

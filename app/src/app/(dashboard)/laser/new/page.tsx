@@ -61,7 +61,7 @@ export default function NewLaserPage() {
       quantityInitial: data.pcsPerPack?.toString() || prev.quantityInitial,
       brand: data.brand || "",
       model: data.model || "",
-      barcode: data.barcode || "",
+      barcode: data.barcode != null ? String(data.barcode) : "",
       imageUrl: data.imageUrl || "",
     }));
 
