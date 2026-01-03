@@ -4,8 +4,8 @@ import { ownerUidSecret } from "./auth.js";
 
 const router = Router();
 
-// POST /api/auth/check-owner - Verificar si el usuario es el owner
-router.post("/check-owner", async (req: AuthenticatedRequest, res: Response) => {
+// GET /api/auth/check-owner - Verificar si el usuario es el owner
+router.get("/check-owner", async (req: AuthenticatedRequest, res: Response) => {
   try {
     const OWNER_UID = ownerUidSecret.value();
 
