@@ -62,8 +62,8 @@ export function WeightEstimator({
         netInitialG,
       });
 
-      setResult(response.data);
-      onEstimate?.(response.data);
+      setResult(response);
+      onEstimate?.(response);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Error al estimar");
     } finally {
