@@ -1,30 +1,62 @@
-import { httpsCallable } from "firebase/functions";
-import { functions } from "./firebase";
+import { api } from "./api";
 import type { Spool, WeighIn } from "@/types/spool";
 import type { LaserMaterial, Movement } from "@/types/laser";
 
-// Auth functions
-export const authCheckOwner = httpsCallable<void, { isOwner: boolean; uid: string }>(
-  functions,
-  "authCheckOwner"
-);
+// ==================== Auth ====================
 
-// Spools - Read
-export const spoolsList = httpsCallable<void, Spool[]>(functions, "spoolsList");
-export const spoolsGet = httpsCallable<{ spoolId: string }, Spool>(functions, "spoolsGet");
-export const spoolsGetWeighIns = httpsCallable<{ spoolId: string }, WeighIn[]>(
-  functions,
-  "spoolsGetWeighIns"
-);
+export async function authCheckOwner(): Promise<{ isOwner: boolean; uid: string }> {
+  return api.get("/auth/check-owner");
+}
 
-// Spools - Write
-export const spoolsCreate = httpsCallable(functions, "spoolsCreate");
-export const spoolsUpdate = httpsCallable(functions, "spoolsUpdate");
-export const spoolsArchive = httpsCallable(functions, "spoolsArchive");
-export const spoolsDelete = httpsCallable(functions, "spoolsDelete");
-export const spoolsAddWeighIn = httpsCallable(functions, "spoolsAddWeighIn");
+// ==================== Spools - Read ====================
 
-// Spools - AI
+export async function spoolsList(): Promise<Spool[]> {
+  return api.get("/spools");
+}
+
+export async function spoolsGet(spoolId: string): Promise<Spool> {
+  return api.get(`/spools/${spoolId}`);
+}
+
+export async function spoolsGetWeighIns(spoolId: string): Promise<WeighIn[]> {
+  return api.get(`/spools/${spoolId}/weigh-ins`);
+}
+
+// ==================== Spools - Write ====================
+
+export async function spoolsCreate(data: Partial<Spool>): Promise<{ id: string }> {
+  return api.post("/spools", data);
+}
+
+export async function spoolsUpdate(
+  spoolId: string,
+  data: Partial<Spool>
+): Promise<{ success: boolean }> {
+  return api.put(`/spools/${spoolId}`, data);
+}
+
+export async function spoolsArchive(spoolId: string): Promise<{ success: boolean }> {
+  return api.post(`/spools/${spoolId}/archive`);
+}
+
+export async function spoolsDelete(spoolId: string): Promise<{ success: boolean }> {
+  return api.delete(`/spools/${spoolId}`);
+}
+
+export async function spoolsAddWeighIn(
+  spoolId: string,
+  data: { weightG: number; note?: string }
+): Promise<{
+  weighInId: string;
+  remainingG: number;
+  remainingPct: number;
+  status: string;
+}> {
+  return api.post(`/spools/${spoolId}/weigh-ins`, data);
+}
+
+// ==================== Spools - AI ====================
+
 export type AIProvider = "perplexity" | "lmstudio";
 
 export interface ScanLabelResult {
@@ -36,6 +68,11 @@ export interface ScanLabelResult {
     color: string | null;
     netWeightG: number | null;
     diameter: number | null;
+    printTempMinC?: number | null;
+    printTempMaxC?: number | null;
+    bedTempMinC?: number | null;
+    bedTempMaxC?: number | null;
+    barcode?: string | null;
     suggestedTareG: number;
     tareSource: "brand" | "default";
   };
@@ -51,22 +88,23 @@ export interface EstimateRemainingResult {
   provider: AIProvider | null;
 }
 
-export const spoolsScanLabel = httpsCallable<
-  { imageBase64: string },
-  ScanLabelResult
->(functions, "spoolsScanLabel");
+export async function spoolsScanLabel(data: {
+  imageBase64: string;
+}): Promise<ScanLabelResult> {
+  return api.post("/spools/scan-label", data);
+}
 
-export const spoolsEstimateRemaining = httpsCallable<
-  {
-    currentWeightG: number;
-    brand?: string;
-    customTareG?: number;
-    netInitialG: number;
-  },
-  EstimateRemainingResult
->(functions, "spoolsEstimateRemaining");
+export async function spoolsEstimateRemaining(data: {
+  currentWeightG: number;
+  brand?: string;
+  customTareG?: number;
+  netInitialG: number;
+}): Promise<EstimateRemainingResult> {
+  return api.post("/spools/estimate-remaining", data);
+}
 
-// Settings
+// ==================== Settings ====================
+
 export interface AISettingsData {
   provider: AIProvider;
   perplexityApiKey: string;
@@ -89,31 +127,56 @@ export interface TestAIResult {
   models?: string[];
 }
 
-export const settingsGetAI = httpsCallable<void, AISettingsData>(
-  functions,
-  "settingsGetAI"
-);
+export async function settingsGetAI(): Promise<AISettingsData> {
+  return api.get("/settings/ai");
+}
 
-export const settingsSaveAI = httpsCallable<AISettingsInput, { success: boolean }>(
-  functions,
-  "settingsSaveAI"
-);
+export async function settingsSaveAI(
+  data: AISettingsInput
+): Promise<{ success: boolean }> {
+  return api.post("/settings/ai", data);
+}
 
-export const settingsTestAI = httpsCallable<void, TestAIResult>(
-  functions,
-  "settingsTestAI"
-);
+export async function settingsTestAI(): Promise<TestAIResult> {
+  return api.post("/settings/ai/test");
+}
 
-// Laser - Read
-export const laserList = httpsCallable<void, LaserMaterial[]>(functions, "laserList");
-export const laserGet = httpsCallable<{ materialId: string }, LaserMaterial>(functions, "laserGet");
-export const laserGetMovements = httpsCallable<{ materialId: string }, Movement[]>(
-  functions,
-  "laserGetMovements"
-);
+// ==================== Laser - Read ====================
 
-// Laser - Write
-export const laserCreate = httpsCallable(functions, "laserCreate");
-export const laserUpdate = httpsCallable(functions, "laserUpdate");
-export const laserAdjustStock = httpsCallable(functions, "laserAdjustStock");
-export const laserDelete = httpsCallable(functions, "laserDelete");
+export async function laserList(): Promise<LaserMaterial[]> {
+  return api.get("/laser");
+}
+
+export async function laserGet(materialId: string): Promise<LaserMaterial> {
+  return api.get(`/laser/${materialId}`);
+}
+
+export async function laserGetMovements(materialId: string): Promise<Movement[]> {
+  return api.get(`/laser/${materialId}/movements`);
+}
+
+// ==================== Laser - Write ====================
+
+export async function laserCreate(
+  data: Partial<LaserMaterial>
+): Promise<{ id: string }> {
+  return api.post("/laser", data);
+}
+
+export async function laserUpdate(
+  materialId: string,
+  data: Partial<LaserMaterial>
+): Promise<{ success: boolean }> {
+  return api.put(`/laser/${materialId}`, data);
+}
+
+export async function laserAdjustStock(
+  materialId: string,
+  data: { delta: number; note?: string }
+): Promise<{ movementId: string; quantityRemaining: number }> {
+  return api.post(`/laser/${materialId}/adjust-stock`, data);
+}
+
+export async function laserDelete(materialId: string): Promise<{ success: boolean }> {
+  return api.delete(`/laser/${materialId}`);
+}

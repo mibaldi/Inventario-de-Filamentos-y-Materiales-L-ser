@@ -51,9 +51,8 @@ export default function NewLaserPage() {
         notes: formData.notes || undefined,
       });
 
-      const data = result.data as { id: string };
       toast.success("Material creado correctamente");
-      router.push(`/laser/${data.id}`);
+      router.push(`/laser/${result.id}`);
     } catch (error: unknown) {
       const message = error instanceof Error ? error.message : "Error al crear material";
       toast.error(message);

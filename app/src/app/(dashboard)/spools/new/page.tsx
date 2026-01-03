@@ -71,9 +71,8 @@ export default function NewSpoolPage() {
         notes: formData.notes || undefined,
       });
 
-      const data = result.data as { id: string };
       toast.success("Bobina creada correctamente");
-      router.push(`/spools/${data.id}`);
+      router.push(`/spools/${result.id}`);
     } catch (error: unknown) {
       const message = error instanceof Error ? error.message : "Error al crear bobina";
       toast.error(message);

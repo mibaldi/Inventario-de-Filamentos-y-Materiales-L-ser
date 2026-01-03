@@ -39,7 +39,7 @@ export default function SettingsPage() {
   const loadSettings = async () => {
     try {
       const result = await settingsGetAI();
-      setSettings(result.data);
+      setSettings(result);
     } catch (error) {
       console.error("Error cargando configuración:", error);
     } finally {
@@ -83,15 +83,15 @@ export default function SettingsPage() {
       // Luego probar la conexión
       const result = await settingsTestAI();
       setTestResult({
-        success: result.data.success,
-        message: result.data.message,
-        models: result.data.models,
+        success: result.success,
+        message: result.message,
+        models: result.models,
       });
 
-      if (result.data.success) {
+      if (result.success) {
         toast.success("Conexión exitosa");
       } else {
-        toast.error(result.data.message);
+        toast.error(result.message);
       }
     } catch (error) {
       const message = error instanceof Error ? error.message : "Error al probar conexión";

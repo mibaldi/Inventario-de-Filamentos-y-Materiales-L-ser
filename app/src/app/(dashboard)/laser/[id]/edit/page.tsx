@@ -40,8 +40,7 @@ export default function EditLaserPage() {
   useEffect(() => {
     const loadMaterial = async () => {
       try {
-        const result = await laserGet({ materialId });
-        const data = result.data as LaserMaterial;
+        const data = await laserGet(materialId);
         setFormData({
           type: data.type,
           thicknessMm: data.thicknessMm.toString(),
@@ -68,8 +67,7 @@ export default function EditLaserPage() {
     setSaving(true);
 
     try {
-      await laserUpdate({
-        materialId,
+      await laserUpdate(materialId, {
         type: formData.type,
         thicknessMm: parseFloat(formData.thicknessMm),
         format: formData.format,

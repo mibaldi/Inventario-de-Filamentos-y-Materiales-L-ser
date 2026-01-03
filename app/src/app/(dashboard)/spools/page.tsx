@@ -85,8 +85,8 @@ export default function SpoolsPage() {
 
   const loadSpools = useCallback(async () => {
     try {
-      const result = await spoolsList();
-      setSpools(result.data as Spool[]);
+      const spools = await spoolsList();
+      setSpools(spools);
     } catch (error) {
       console.error("Error cargando bobinas:", error);
     } finally {

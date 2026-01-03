@@ -57,8 +57,8 @@ export function LabelScanner({ onScanComplete }: LabelScannerProps) {
       const base64 = imagePreview.split(",")[1];
       const result = await spoolsScanLabel({ imageBase64: base64 });
 
-      if (result.data.success) {
-        setScanResult(result.data.data);
+      if (result.success) {
+        setScanResult(result.data);
       } else {
         setError("No se pudo analizar la etiqueta");
       }

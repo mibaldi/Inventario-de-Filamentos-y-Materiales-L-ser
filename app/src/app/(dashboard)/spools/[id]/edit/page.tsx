@@ -42,8 +42,7 @@ export default function EditSpoolPage() {
   useEffect(() => {
     const loadSpool = async () => {
       try {
-        const result = await spoolsGet({ spoolId });
-        const data = result.data as Spool;
+        const data = await spoolsGet(spoolId);
         setFormData({
           label: data.label,
           material: data.material,
@@ -70,8 +69,7 @@ export default function EditSpoolPage() {
     setSaving(true);
 
     try {
-      await spoolsUpdate({
-        spoolId,
+      await spoolsUpdate(spoolId, {
         label: formData.label,
         material: formData.material,
         color: formData.color,

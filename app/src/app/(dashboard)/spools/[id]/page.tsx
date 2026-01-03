@@ -59,12 +59,12 @@ export default function SpoolDetailPage() {
 
   const loadData = useCallback(async () => {
     try {
-      const [spoolRes, weighInsRes] = await Promise.all([
-        spoolsGet({ spoolId }),
-        spoolsGetWeighIns({ spoolId }),
+      const [spoolData, weighInsData] = await Promise.all([
+        spoolsGet(spoolId),
+        spoolsGetWeighIns(spoolId),
       ]);
-      setSpool(spoolRes.data as Spool);
-      setWeighIns(weighInsRes.data as WeighIn[]);
+      setSpool(spoolData);
+      setWeighIns(weighInsData);
     } catch (error) {
       console.error("Error cargando datos:", error);
       setSpool(null);
@@ -82,8 +82,7 @@ export default function SpoolDetailPage() {
     setWeighInLoading(true);
 
     try {
-      await spoolsAddWeighIn({
-        spoolId,
+      await spoolsAddWeighIn(spoolId, {
         weightG: parseFloat(weightG),
         note: weighInNote || undefined,
       });
@@ -102,7 +101,7 @@ export default function SpoolDetailPage() {
 
   const handleArchive = async () => {
     try {
-      await spoolsArchive({ spoolId });
+      await spoolsArchive(spoolId);
       toast.success("Bobina archivada");
       loadData();
     } catch (error: unknown) {
@@ -114,7 +113,7 @@ export default function SpoolDetailPage() {
   const handleDelete = async () => {
     setDeleteLoading(true);
     try {
-      await spoolsDelete({ spoolId });
+      await spoolsDelete(spoolId);
       toast.success("Bobina eliminada");
       router.push("/spools");
     } catch (error: unknown) {

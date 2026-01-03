@@ -97,8 +97,8 @@ export default function LaserPage() {
 
   const loadMaterials = useCallback(async () => {
     try {
-      const result = await laserList();
-      setMaterials(result.data as LaserMaterial[]);
+      const materials = await laserList();
+      setMaterials(materials);
     } catch (error) {
       console.error("Error cargando materiales:", error);
     } finally {

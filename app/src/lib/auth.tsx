@@ -44,7 +44,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setCheckingOwner(true);
         try {
           const result = await authCheckOwner();
-          setIsOwner(result.data.isOwner);
+          setIsOwner(result.isOwner);
         } catch (error) {
           console.error("Error verificando owner:", error);
           setIsOwner(false);

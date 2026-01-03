@@ -85,13 +85,10 @@ export default function DashboardPage() {
 
   const loadData = useCallback(async () => {
     try {
-      const [spoolsRes, laserRes] = await Promise.all([
+      const [allSpools, allLaser] = await Promise.all([
         spoolsList(),
         laserList(),
       ]);
-
-      const allSpools = spoolsRes.data as Spool[];
-      const allLaser = laserRes.data as LaserMaterial[];
 
       setTotalSpools(allSpools.filter(s => s.status !== "ARCHIVED").length);
       setTotalLaser(allLaser.length);

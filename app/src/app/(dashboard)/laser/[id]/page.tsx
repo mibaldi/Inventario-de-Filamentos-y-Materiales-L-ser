@@ -61,12 +61,12 @@ export default function LaserDetailPage() {
 
   const loadData = useCallback(async () => {
     try {
-      const [matRes, movRes] = await Promise.all([
-        laserGet({ materialId }),
-        laserGetMovements({ materialId }),
+      const [materialData, movementsData] = await Promise.all([
+        laserGet(materialId),
+        laserGetMovements(materialId),
       ]);
-      setMaterial(matRes.data as LaserMaterial);
-      setMovements(movRes.data as Movement[]);
+      setMaterial(materialData);
+      setMovements(movementsData);
     } catch (error) {
       console.error("Error cargando datos:", error);
       setMaterial(null);
@@ -88,7 +88,7 @@ export default function LaserDetailPage() {
       : Math.abs(parseInt(adjustQty));
 
     try {
-      await laserAdjustStock({ materialId, delta, note: adjustNote || undefined });
+      await laserAdjustStock(materialId, { delta, note: adjustNote || undefined });
       toast.success(adjustMode === "consume" ? "Consumo registrado" : "Stock agregado");
       setAdjustOpen(false);
       setAdjustQty("");
@@ -105,7 +105,7 @@ export default function LaserDetailPage() {
   const handleDelete = async () => {
     setDeleteLoading(true);
     try {
-      await laserDelete({ materialId });
+      await laserDelete(materialId);
       toast.success("Material eliminado");
       router.push("/laser");
     } catch (error: unknown) {
