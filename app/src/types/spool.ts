@@ -7,6 +7,7 @@ export interface Spool {
   brand: string | null;
   material: string;
   color: string;
+  colorHex: string | null;
   diameter: number;
   netInitialG: number;
   tareG: number;
@@ -35,6 +36,7 @@ export interface SpoolCreateInput {
   brand?: string;
   material: string;
   color: string;
+  colorHex?: string;
   diameter: number;
   netInitialG: number;
   tareG: number;
@@ -50,6 +52,7 @@ export interface SpoolUpdateInput {
   brand?: string | null;
   material?: string;
   color?: string;
+  colorHex?: string | null;
   diameter?: number;
   netInitialG?: number;
   tareG?: number;

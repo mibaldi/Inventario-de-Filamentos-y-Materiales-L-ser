@@ -72,6 +72,7 @@ router.post("/", async (req: AuthenticatedRequest, res: Response) => {
       brand: data.brand ?? null,
       material: data.material,
       color: data.color,
+      colorHex: data.colorHex ?? null,
       diameter: data.diameter,
       netInitialG: data.netInitialG,
       tareG: data.tareG,

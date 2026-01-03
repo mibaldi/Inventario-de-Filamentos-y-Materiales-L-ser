@@ -80,6 +80,21 @@ export default function NewLaserPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Validar campos requeridos
+    if (!formData.type) {
+      toast.error("Selecciona un tipo de material");
+      return;
+    }
+    if (!formData.thicknessMm) {
+      toast.error("Selecciona el espesor del material");
+      return;
+    }
+    if (!formData.quantityInitial) {
+      toast.error("Indica la cantidad inicial");
+      return;
+    }
+
     setLoading(true);
 
     try {

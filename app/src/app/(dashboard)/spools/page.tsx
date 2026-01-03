@@ -218,17 +218,26 @@ export default function SpoolsPage() {
                       className="spool-ring w-12 h-12 flex-shrink-0"
                       style={{
                         '--spool-percent': spool.remainingPct ? spool.remainingPct * 100 : (spool.status === 'NEW' ? 100 : 0),
-                        '--spool-color': spool.status === 'EMPTY' ? 'oklch(0.58 0.20 25)' :
-                          spool.status === 'LOW' ? 'oklch(0.72 0.16 85)' : 'oklch(0.65 0.18 145)'
+                        '--spool-color': spool.colorHex ?? (spool.status === 'EMPTY' ? 'oklch(0.58 0.20 25)' :
+                          spool.status === 'LOW' ? 'oklch(0.72 0.16 85)' : 'oklch(0.65 0.18 145)')
                       } as React.CSSProperties}
                     />
-                    <div className="min-w-0">
-                      <h3 className="font-semibold truncate group-hover:text-primary transition-colors">
-                        {spool.label}
-                      </h3>
-                      <p className="text-sm text-muted-foreground truncate">
-                        {spool.material} - {spool.color}
-                      </p>
+                    <div className="min-w-0 flex items-center gap-2">
+                      {spool.colorHex && (
+                        <div
+                          className="w-4 h-4 rounded-full border border-gray-300 flex-shrink-0"
+                          style={{ backgroundColor: spool.colorHex }}
+                          title={spool.color}
+                        />
+                      )}
+                      <div className="min-w-0">
+                        <h3 className="font-semibold truncate group-hover:text-primary transition-colors">
+                          {spool.label}
+                        </h3>
+                        <p className="text-sm text-muted-foreground truncate">
+                          {spool.material} - {spool.color}
+                        </p>
+                      </div>
                     </div>
                   </div>
                   <span className={statusBadgeClass[spool.status]}>

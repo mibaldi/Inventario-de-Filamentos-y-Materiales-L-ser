@@ -221,6 +221,18 @@ export const BAMBU_MATERIALS: BambuMaterial[] = [
     imageUrl: "https://eu.store.bambulab.com/cdn/shop/files/YJ002.png?v=1731055126&width=800",
     aliases: ["yj002", "b-yj002", "fieltro", "felt fabric"],
   },
+  // PU Iron-On Patch (Parche termoadhesivo PU)
+  {
+    name: "Rectangular PU Iron-On Patch (10PCS)",
+    model: "B-YD005",
+    barcode: "6977252429306",
+    type: "Tela",
+    thicknessMm: 1.8,
+    pcsPerPack: 10,
+    safeFlag: "CAUTION",
+    imageUrl: "https://eu.store.bambulab.com/cdn/shop/files/YD005.png?v=1731055140&width=800",
+    aliases: ["yd005", "b-yd005", "parche pu", "iron-on patch", "parche termoadhesivo"],
+  },
 ];
 
 // Buscar material por código de barras

@@ -18,6 +18,8 @@ import { spoolsCreate, type ScanLabelResult } from "@/lib/functions";
 import { FILAMENT_MATERIALS, FILAMENT_DIAMETERS } from "@/types/spool";
 import { LabelScanner } from "@/components/label-scanner";
 import { getBrandNames } from "@/data/filament-brands";
+import { ColorPicker } from "@/components/color-picker";
+import { findColorByName } from "@/data/filament-colors";
 
 export default function NewSpoolPage() {
   const router = useRouter();
@@ -27,6 +29,7 @@ export default function NewSpoolPage() {
     brand: "",
     material: "",
     color: "",
+    colorHex: null as string | null,
     diameter: "1.75",
     netInitialG: "",
     tareG: "",
@@ -38,11 +41,13 @@ export default function NewSpoolPage() {
   const brandNames = getBrandNames();
 
   const handleScanComplete = (data: ScanLabelResult["data"]) => {
+    const colorMatch = data.color ? findColorByName(data.color) : null;
     setFormData((prev) => ({
       ...prev,
       brand: data.brand ?? prev.brand,
       material: data.material ?? prev.material,
       color: data.color ?? prev.color,
+      colorHex: colorMatch?.hex ?? prev.colorHex,
       diameter: data.diameter?.toString() ?? prev.diameter,
       netInitialG: data.netWeightG?.toString() ?? prev.netInitialG,
       tareG: data.suggestedTareG?.toString() ?? prev.tareG,
@@ -63,6 +68,7 @@ export default function NewSpoolPage() {
         brand: formData.brand || undefined,
         material: formData.material,
         color: formData.color,
+        colorHex: formData.colorHex || undefined,
         diameter: parseFloat(formData.diameter),
         netInitialG: parseFloat(formData.netInitialG),
         tareG: parseFloat(formData.tareG),
@@ -157,14 +163,11 @@ export default function NewSpoolPage() {
 
               <div className="space-y-2">
                 <Label htmlFor="color">Color *</Label>
-                <Input
-                  id="color"
-                  placeholder="Gris"
+                <ColorPicker
                   value={formData.color}
-                  onChange={(e) =>
-                    setFormData({ ...formData, color: e.target.value })
+                  onChange={(colorName, colorHex) =>
+                    setFormData({ ...formData, color: colorName, colorHex })
                   }
-                  required
                 />
               </div>
 

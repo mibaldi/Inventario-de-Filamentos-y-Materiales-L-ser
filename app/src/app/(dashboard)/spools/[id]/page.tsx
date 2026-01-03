@@ -150,6 +150,13 @@ export default function SpoolDetailPage() {
       <div className="flex items-start justify-between">
         <div>
           <div className="flex items-center gap-3">
+            {spool.colorHex && (
+              <div
+                className="w-8 h-8 rounded-full border-2 border-gray-300 flex-shrink-0"
+                style={{ backgroundColor: spool.colorHex }}
+                title={spool.color}
+              />
+            )}
             <h1 className="text-2xl font-bold">{spool.label}</h1>
             <Badge variant={statusColors[spool.status]}>{spool.status}</Badge>
           </div>
