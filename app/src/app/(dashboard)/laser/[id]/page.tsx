@@ -200,10 +200,42 @@ export default function LaserDetailPage() {
         </DialogContent>
       </Dialog>
 
+      {/* Imagen del material si existe */}
+      {material.imageUrl && (
+        <Card>
+          <CardContent className="p-6">
+            <div className="flex items-center gap-6">
+              <img
+                src={material.imageUrl}
+                alt={material.type}
+                className="w-32 h-32 object-contain rounded-lg border bg-white"
+              />
+              <div className="flex-1">
+                {material.brand && (
+                  <p className="text-lg font-semibold">{material.brand}</p>
+                )}
+                {material.model && (
+                  <p className="text-muted-foreground">Modelo: {material.model}</p>
+                )}
+                {material.barcode && (
+                  <p className="text-sm text-muted-foreground font-mono mt-1">{material.barcode}</p>
+                )}
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       <div className="grid gap-6 md:grid-cols-2">
         <Card>
           <CardHeader><CardTitle>Informacion</CardTitle></CardHeader>
           <CardContent className="space-y-3">
+            {material.brand && !material.imageUrl && (
+              <div className="flex justify-between"><span className="text-muted-foreground">Marca</span><span>{material.brand}</span></div>
+            )}
+            {material.model && !material.imageUrl && (
+              <div className="flex justify-between"><span className="text-muted-foreground">Modelo</span><span>{material.model}</span></div>
+            )}
             <div className="flex justify-between"><span className="text-muted-foreground">Tipo</span><span>{material.type}</span></div>
             <div className="flex justify-between"><span className="text-muted-foreground">Espesor</span><span>{material.thicknessMm} mm</span></div>
             <div className="flex justify-between"><span className="text-muted-foreground">Formato</span><span>{material.format === "SHEET" ? "Hojas" : "Piezas"}</span></div>
@@ -213,6 +245,9 @@ export default function LaserDetailPage() {
             <div className="flex justify-between"><span className="text-muted-foreground">Stock</span><span className={`font-medium ${isLow ? "text-red-500" : ""}`}>{material.quantityRemaining} / {material.quantityInitial}</span></div>
             {material.thresholdQty && (<div className="flex justify-between"><span className="text-muted-foreground">Umbral alerta</span><span>{material.thresholdQty}</span></div>)}
             {material.location && (<div className="flex justify-between"><span className="text-muted-foreground">Ubicacion</span><span>{material.location}</span></div>)}
+            {material.barcode && !material.imageUrl && (
+              <div className="flex justify-between"><span className="text-muted-foreground">Codigo barras</span><span className="font-mono text-sm">{material.barcode}</span></div>
+            )}
             {material.notes && (<div className="pt-2 border-t"><p className="text-sm text-muted-foreground">Notas</p><p className="text-sm">{material.notes}</p></div>)}
             <div className="pt-3">
               <div className="h-3 bg-muted rounded-full overflow-hidden">

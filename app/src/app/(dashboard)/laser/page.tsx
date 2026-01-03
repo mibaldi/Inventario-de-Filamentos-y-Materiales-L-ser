@@ -211,19 +211,28 @@ export default function LaserPage() {
                   {/* Header */}
                   <div className="flex items-start justify-between gap-3 mb-4">
                     <div className="flex items-center gap-3 min-w-0">
-                      <div className="p-2.5 rounded-lg bg-laser-muted flex-shrink-0">
-                        {mat.format === "SHEET" ? (
-                          <SheetIcon className="h-5 w-5 text-laser" />
-                        ) : (
-                          <LaserIcon className="h-5 w-5 text-laser" />
-                        )}
-                      </div>
+                      {mat.imageUrl ? (
+                        <img
+                          src={mat.imageUrl}
+                          alt={mat.type}
+                          className="w-12 h-12 object-contain rounded-lg border bg-white flex-shrink-0"
+                        />
+                      ) : (
+                        <div className="p-2.5 rounded-lg bg-laser-muted flex-shrink-0">
+                          {mat.format === "SHEET" ? (
+                            <SheetIcon className="h-5 w-5 text-laser" />
+                          ) : (
+                            <LaserIcon className="h-5 w-5 text-laser" />
+                          )}
+                        </div>
+                      )}
                       <div className="min-w-0">
                         <h3 className="font-semibold truncate group-hover:text-laser transition-colors">
-                          {mat.type}
+                          {mat.brand ? `${mat.type} ${mat.brand}` : mat.type}
                         </h3>
                         <p className="text-sm text-muted-foreground">
                           {mat.thicknessMm} mm - {mat.format === "SHEET" ? "Hojas" : "Piezas"}
+                          {mat.model && <span className="ml-1">({mat.model})</span>}
                         </p>
                       </div>
                     </div>
