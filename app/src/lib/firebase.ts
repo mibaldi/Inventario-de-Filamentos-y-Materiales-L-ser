@@ -1,6 +1,6 @@
 "use client";
 
-import { initializeApp, getApps, type FirebaseApp } from "firebase/app";
+import { initializeApp, getApps, type FirebaseApp, setLogLevel } from "firebase/app";
 import { getAuth as firebaseGetAuth, type Auth } from "firebase/auth";
 import { getFirestore as firebaseGetFirestore, type Firestore } from "firebase/firestore";
 import { getFunctions as firebaseGetFunctions, type Functions } from "firebase/functions";
@@ -22,6 +22,7 @@ let functions: Functions;
 let storage: FirebaseStorage;
 
 if (typeof window !== "undefined") {
+  setLogLevel("debug");
   app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
   auth = firebaseGetAuth(app);
   db = firebaseGetFirestore(app);

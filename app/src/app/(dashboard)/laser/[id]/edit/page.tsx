@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/select";
 import { laserGet, laserUpdate } from "@/lib/functions";
 import { LASER_MATERIAL_TYPES, COMMON_THICKNESSES, type LaserMaterial, type LaserFormat, type SafeFlag } from "@/types/laser";
+import { X } from "lucide-react";
 
 export default function EditLaserPage() {
   const params = useParams();
@@ -35,6 +36,10 @@ export default function EditLaserPage() {
     thresholdQty: "",
     location: "",
     notes: "",
+    brand: "",
+    model: "",
+    barcode: "",
+    imageUrl: "",
   });
 
   useEffect(() => {
@@ -52,6 +57,10 @@ export default function EditLaserPage() {
           thresholdQty: data.thresholdQty?.toString() ?? "",
           location: data.location ?? "",
           notes: data.notes ?? "",
+          brand: data.brand ?? "",
+          model: data.model ?? "",
+          barcode: data.barcode ?? "",
+          imageUrl: data.imageUrl ?? "",
         });
       } catch (error) {
         console.error("Error cargando material:", error);
@@ -78,6 +87,10 @@ export default function EditLaserPage() {
         thresholdQty: formData.thresholdQty ? parseInt(formData.thresholdQty) : null,
         location: formData.location || null,
         notes: formData.notes || null,
+        brand: formData.brand || null,
+        model: formData.model || null,
+        barcode: formData.barcode || null,
+        imageUrl: formData.imageUrl || null,
       });
 
       toast.success("Material actualizado");
@@ -107,6 +120,23 @@ export default function EditLaserPage() {
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
+            {formData.imageUrl && (
+              <div className="relative w-32 h-32 mx-auto">
+                <img
+                  src={formData.imageUrl}
+                  alt="Imagen del material"
+                  className="w-full h-full object-contain rounded-lg border"
+                />
+                <button
+                  type="button"
+                  onClick={() => setFormData({ ...formData, imageUrl: "" })}
+                  className="absolute -top-2 -right-2 bg-destructive text-destructive-foreground rounded-full p-1 hover:bg-destructive/90"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+            )}
+
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="space-y-2">
                 <Label htmlFor="type">Tipo de material *</Label>
@@ -176,6 +206,28 @@ export default function EditLaserPage() {
             <div className="space-y-2">
               <Label htmlFor="notes">Notas</Label>
               <Input id="notes" value={formData.notes} onChange={(e) => setFormData({ ...formData, notes: e.target.value })} />
+            </div>
+
+            <div className="border-t pt-4 mt-4">
+              <h3 className="text-sm font-medium mb-3">Informacion del fabricante</h3>
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div className="space-y-2">
+                  <Label htmlFor="brand">Marca</Label>
+                  <Input id="brand" placeholder="Ej: Bambu Lab" value={formData.brand} onChange={(e) => setFormData({ ...formData, brand: e.target.value })} />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="model">Modelo</Label>
+                  <Input id="model" placeholder="Ej: Basswood Sheet 3mm" value={formData.model} onChange={(e) => setFormData({ ...formData, model: e.target.value })} />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="barcode">Codigo de barras</Label>
+                  <Input id="barcode" placeholder="Ej: 6971219901234" value={formData.barcode} onChange={(e) => setFormData({ ...formData, barcode: e.target.value })} />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="imageUrl">URL de imagen</Label>
+                  <Input id="imageUrl" type="url" placeholder="https://ejemplo.com/imagen.jpg" value={formData.imageUrl} onChange={(e) => setFormData({ ...formData, imageUrl: e.target.value })} />
+                </div>
+              </div>
             </div>
 
             <div className="flex gap-3 pt-4">

@@ -16,6 +16,9 @@ import {
 } from "@/components/ui/select";
 import { spoolsGet, spoolsUpdate } from "@/lib/functions";
 import { FILAMENT_MATERIALS, FILAMENT_DIAMETERS, type Spool, type SpoolStatus } from "@/types/spool";
+import { getBrandNames } from "@/data/filament-brands";
+import { ColorPicker } from "@/components/color-picker";
+import { X } from "lucide-react";
 
 const SPOOL_STATUSES: SpoolStatus[] = ["NEW", "IN_USE", "LOW", "EMPTY", "ARCHIVED"];
 
@@ -26,10 +29,14 @@ export default function EditSpoolPage() {
 
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const brandNames = getBrandNames();
   const [formData, setFormData] = useState({
     label: "",
+    brand: "",
     material: "",
     color: "",
+    colorHex: null as string | null,
+    imageUrl: "",
     diameter: "1.75",
     netInitialG: "",
     tareG: "",
@@ -45,8 +52,11 @@ export default function EditSpoolPage() {
         const data = await spoolsGet(spoolId);
         setFormData({
           label: data.label,
+          brand: data.brand ?? "",
           material: data.material,
           color: data.color,
+          colorHex: data.colorHex ?? null,
+          imageUrl: data.imageUrl ?? "",
           diameter: data.diameter.toString(),
           netInitialG: data.netInitialG.toString(),
           tareG: data.tareG.toString(),
@@ -71,8 +81,11 @@ export default function EditSpoolPage() {
     try {
       await spoolsUpdate(spoolId, {
         label: formData.label,
+        brand: formData.brand || null,
         material: formData.material,
         color: formData.color,
+        colorHex: formData.colorHex,
+        imageUrl: formData.imageUrl || null,
         diameter: parseFloat(formData.diameter),
         netInitialG: parseFloat(formData.netInitialG),
         tareG: parseFloat(formData.tareG),
@@ -109,6 +122,23 @@ export default function EditSpoolPage() {
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
+            {formData.imageUrl && (
+              <div className="relative w-32 h-32 mx-auto">
+                <img
+                  src={formData.imageUrl}
+                  alt="Imagen del filamento"
+                  className="w-full h-full object-contain rounded-lg border"
+                />
+                <button
+                  type="button"
+                  onClick={() => setFormData({ ...formData, imageUrl: "" })}
+                  className="absolute -top-2 -right-2 bg-destructive text-destructive-foreground rounded-full p-1 hover:bg-destructive/90"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+            )}
+
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="space-y-2">
                 <Label htmlFor="label">Nombre / Etiqueta *</Label>
@@ -118,6 +148,24 @@ export default function EditSpoolPage() {
                   onChange={(e) => setFormData({ ...formData, label: e.target.value })}
                   required
                 />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="brand">Marca</Label>
+                <Select
+                  value={formData.brand || "none"}
+                  onValueChange={(value) => setFormData({ ...formData, brand: value === "none" ? "" : value })}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Seleccionar marca" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="none">Otra / Desconocida</SelectItem>
+                    {brandNames.map((brand) => (
+                      <SelectItem key={brand} value={brand}>{brand}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
 
               <div className="space-y-2">
@@ -139,11 +187,9 @@ export default function EditSpoolPage() {
 
               <div className="space-y-2">
                 <Label htmlFor="color">Color *</Label>
-                <Input
-                  id="color"
+                <ColorPicker
                   value={formData.color}
-                  onChange={(e) => setFormData({ ...formData, color: e.target.value })}
-                  required
+                  onChange={(colorName, colorHex) => setFormData({ ...formData, color: colorName, colorHex })}
                 />
               </div>
 
@@ -236,6 +282,20 @@ export default function EditSpoolPage() {
                 value={formData.notes}
                 onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
               />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="imageUrl">URL de imagen</Label>
+              <Input
+                id="imageUrl"
+                type="url"
+                placeholder="https://ejemplo.com/imagen.jpg"
+                value={formData.imageUrl}
+                onChange={(e) => setFormData({ ...formData, imageUrl: e.target.value })}
+              />
+              <p className="text-xs text-muted-foreground">
+                URL de una imagen del filamento (opcional)
+              </p>
             </div>
 
             <div className="flex gap-3 pt-4">
