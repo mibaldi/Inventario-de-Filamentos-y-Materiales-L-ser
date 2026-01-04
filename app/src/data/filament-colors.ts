@@ -58,6 +58,18 @@ export const FILAMENT_COLORS: FilamentColor[] = [
   { name: "Transparent", hex: "#E5E7EB", nameEs: "Transparente" },
   { name: "Natural", hex: "#FAF9F6", nameEs: "Natural" },
   { name: "Glow in Dark", hex: "#BFFF00", nameEs: "Fosforescente" },
+
+  // Seda (Silk)
+  { name: "Silk Gold", hex: "#D4AF37", nameEs: "Seda Dorado" },
+  { name: "Silk Silver", hex: "#C4CACE", nameEs: "Seda Plata" },
+  { name: "Silk Copper", hex: "#B87333", nameEs: "Seda Cobre" },
+  { name: "Silk Bronze", hex: "#CD7F32", nameEs: "Seda Bronce" },
+  { name: "Silk Blue", hex: "#5B9BD5", nameEs: "Seda Azul" },
+  { name: "Silk Red", hex: "#C44536", nameEs: "Seda Rojo" },
+  { name: "Silk Green", hex: "#50C878", nameEs: "Seda Verde" },
+  { name: "Silk Purple", hex: "#9966CC", nameEs: "Seda Morado" },
+  { name: "Silk Pink", hex: "#FFB6C1", nameEs: "Seda Rosa" },
+  { name: "Silk White", hex: "#F8F8FF", nameEs: "Seda Blanco" },
 ];
 
 // Buscar color por nombre (en ingles o espanol)
